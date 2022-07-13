@@ -21,15 +21,6 @@ class PhLocationService
     end
   end
 
-  def get_provinces
-    response = RestClient.get("#{url}/provinces")
-    provinces = JSON.parse(response.body)
-    provinces.each do |province|
-      region = Region.find_by_code(province['regionCode'])
-      Province.find_or_create_by(code: province['code'], name: province['name'], region: region)
-    end
-  end
-
   def get_district
     response = RestClient.get("#{url}/districts")
     districts = JSON.parse(response.body)
@@ -43,15 +34,28 @@ class PhLocationService
     response = RestClient.get("#{url}/cities-municipalities")
     cities_municipalities = JSON.parse(response.body)
     cities_municipalities .each do |city_municipality|
-      unless city_municipality['provinceCode']
+      if city_municipality['provinceCode']
         province = Province.find_by_code(city_municipality['provinceCode'])
         CityMunicipality.find_or_create_by(code: city_municipality['code'], name: city_municipality['name'], is_capital:city_municipality['isCapital'], is_city:city_municipality['isCity'], is_municipality: city_municipality['isMunicipality'], province: province)
       else
         district = District.find_by_code(city_municipality['districtCode'])
-        CityMunicipality.find_or_create_by(code: city_municipality['code'], name: city_municipality['name'], is_capital:city_municipality['isCapital'], is_city:city_municipality['isCity'], is_municipality: city_municipality['isMunicipality'], province: district)
+        CityMunicipality.find_or_create_by(code: city_municipality['code'], name: city_municipality['name'], is_capital:city_municipality['isCapital'], is_city:city_municipality['isCity'], is_municipality: city_municipality['isMunicipality'], district: district)
       end
     end
   end
 
-
+  def get_barangay
+    response = RestClient.get("#{url}/barangays")
+    barangays = JSON.parse(response.body)
+    barangays.each do |barangay|
+      if barangay['cityCode']
+        city_municipality = CityMunicipality.find_by_code(barangay['cityCode'])
+        code_num = barangay['cityCode']
+      else
+        city_municipality = CityMunicipality.find_by_code(barangay['municipalityCode'])
+        code_num = barangay['municipalityCode']
+      end
+      Barangay.find_or_create_by(code: code_num, name: barangay["name"], city_municipality: city_municipality)
+    end
+  end
 end
