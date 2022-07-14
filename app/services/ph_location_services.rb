@@ -50,12 +50,10 @@ class PhLocationService
     barangays.each do |barangay|
       if barangay['cityCode']
         city_municipality = CityMunicipality.find_by_code(barangay['cityCode'])
-        code_num = barangay['cityCode']
       else
         city_municipality = CityMunicipality.find_by_code(barangay['municipalityCode'])
-        code_num = barangay['municipalityCode']
       end
-      Barangay.find_or_create_by(code: code_num, name: barangay["name"], city_municipality: city_municipality)
+      Barangay.find_or_create_by(code: barangay["code"], name: barangay["name"], city_municipality: city_municipality)
     end
   end
 end
