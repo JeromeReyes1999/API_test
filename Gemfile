@@ -20,6 +20,7 @@ gem 'jbuilder', '~> 2.7'
 
 gem 'mysql2'
 gem 'rest-client'
+gem 'active_model_serializers'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
